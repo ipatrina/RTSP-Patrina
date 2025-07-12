@@ -70,7 +70,9 @@ For the most typical RTSP streams, please head over to the GStreamer project.
 2.支持使用HTTP代理建立RTSP连接。可指定HTTP代理鉴权字符串。
 
 预设文件示例：
+
 #DEFINE [Proxy] proxy.example.net:8080
+
 #DEFINE [Proxy-Authorization] Basic dXNlcm5hbWU6cGFzc3dvcmQ=
 
 3.选择任务名称时，默认存储为*.ts文件。
