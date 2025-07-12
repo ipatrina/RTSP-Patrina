@@ -36,7 +36,46 @@ Applicable for Windows 7 and above operating systems.
 适用于Windows 7及以上操作系统。
 
 
+# Software limitations / 软件限制
+
+The software currently has the following limitations as we haven't yet seen any use case beyond.
+
+⚠️ Only tested w/ IPv4 connections.
+
+⚠️ Does not support TLS.
+
+⚠️ Does not support Digest authentication.
+
+For the most typical RTSP streams, please head over to the GStreamer project.
+
+---
+
+本软件当前具有以下使用限制，因为尚未发现超出的实际用例。
+
+⚠️ 仅测试了IPv4连接。
+
+⚠️ 不支持TLS连接。
+
+⚠️ 不支持Digest身份验证。
+
+对于常规一类RTSP媒体流，请直接移步至 GStreamer 项目。
+
+
 # Changelog / 更新日志
+
+**5.5.0 (2025/07/12)**
+
+1.更新项目框架至 Microsoft .NET Framework 4.7.2 版本。
+
+2.支持使用HTTP代理建立RTSP连接。可指定HTTP代理鉴权字符串。
+
+预设文件示例：
+#DEFINE [Proxy] proxy.example.net:8080
+#DEFINE [Proxy-Authorization] Basic dXNlcm5hbWU6cGFzc3dvcmQ=
+
+3.选择任务名称时，默认存储为*.ts文件。
+
+---
 
 **5.3.0 (2022/08/06)**
 
