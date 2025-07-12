@@ -309,7 +309,7 @@ Public Class MainUI
     Private Sub TsiAbout_Click(sender As Object, e As EventArgs) Handles TsiAbout.Click
         Try
             Dim VersionStrings As String() = Application.ProductVersion.ToString.Split(".")
-            MsgBox("RTSP Patrina" & vbCrLf & vbCrLf & "Version: " & VersionStrings(0) & "." & VersionStrings(1) & "." & VersionStrings(2) & vbCrLf & "Date: 20" & VersionStrings(3).Substring(0, 2) & "." & VersionStrings(3).Substring(2, 2) & vbCrLf & vbCrLf & "Copyright © 2017-2022." & vbCrLf & "All rights reserved.", vbInformation, TsiAbout.Text)
+            MsgBox("RTSP Patrina" & vbCrLf & vbCrLf & "Version: " & VersionStrings(0) & "." & VersionStrings(1) & "." & VersionStrings(2) & vbCrLf & "Date: 20" & VersionStrings(3).Substring(0, 2) & "." & VersionStrings(3).Substring(2, 2) & vbCrLf & vbCrLf & "Copyright © 2017-2025." & vbCrLf & "All rights reserved.", vbInformation, TsiAbout.Text)
         Catch ex As Exception
 
         End Try
@@ -389,8 +389,30 @@ Public Class MainUI
                     _loc_6 = RTSP_HOST.Split(":")
                     RTSP_SERVER_IP = ParseIP(_loc_6(0))
                     If _loc_6.Count > 1 Then RTSP_SERVER_PORT = Int(_loc_6(1))
+
+                    Dim USE_PROXY As Boolean = False
+                    If Not DEFINITION_LIST("[Proxy]") = "" Then
+                        Dim _loc_7 As String() = DEFINITION_LIST("[Proxy]").Split(":")
+                        If _loc_7.Count > 1 Then
+                            RTSP_SERVER_IP = ParseIP(_loc_7(0))
+                            RTSP_SERVER_PORT = Int(_loc_7(1))
+                            USE_PROXY = True
+                        End If
+                    End If
+
                     RTSP_CONNECTION = New TCPClient
                     RTSP_CONNECTION.Connect(RTSP_SERVER_IP, RTSP_SERVER_PORT)
+
+                    If USE_PROXY Then
+                        If Not RTSP_HOST.Contains(":") Then RTSP_HOST &= ":554"
+                        Dim VersionStrings As String() = Application.ProductVersion.ToString.Split(".")
+                        Dim MESSAGE_STRING_PROXY As String = "CONNECT " & RTSP_HOST & " HTTP/1.1" & vbCrLf & "Host: " & RTSP_HOST & vbCrLf & "Proxy-Connection: close" & vbCrLf & "User-Agent: RTSP-Patrina/" & VersionStrings(0) & "." & VersionStrings(1) & "." & VersionStrings(2)
+                        If Not DEFINITION_LIST("[Proxy-Authorization]") = "" Then MESSAGE_STRING_PROXY &= vbCrLf & "Proxy-Authorization: " & DEFINITION_LIST("[Proxy-Authorization]")
+                        CONSOLE_PRINT(MESSAGE_STRING_PROXY & vbCrLf & vbCrLf, False)
+                        RTSP_CONNECTION.SendString(MESSAGE_STRING_PROXY)
+                        If Not HANDLE_RECEIVE() Then Exit While
+                    End If
+
                     RTSP_URL = MESSAGE_PATH.Split("?")(0)
                     CONNECTION_ESTABLISHED = True
                 End If
@@ -455,9 +477,7 @@ Public Class MainUI
             Dim _loc_11 As Integer = Time() + 10
             While HANDLE_TEARDOWN
                 Thread.Sleep(50)
-                If Time() > _loc_11 Then
-                    CONNECTION_CLOSE()
-                End If
+                If Time() > _loc_11 Then CONNECTION_CLOSE()
             End While
         Catch ex As Exception
 
@@ -741,6 +761,8 @@ Public Class MainUI
                 Array.Copy(_loc_2, 0, _loc_8, 0, _loc_6)
                 Dim RTSP_RESPONSE As String = Encoding.UTF8.GetString(_loc_8)
                 CONSOLE_PRINT(RTSP_RESPONSE & vbCrLf, False)
+
+                If RTSP_RESPONSE.Split(vbCrLf)(0).ToLower.Replace(" ", "").Contains("http/1.1200") Then Return True
 
                 Dim _loc_9 As Boolean = False
                 If RTSP_RESPONSE.Split(vbCrLf)(0).ToLower.Replace(" ", "").Contains("200ok") Then

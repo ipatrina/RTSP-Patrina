@@ -229,7 +229,7 @@ Partial Class MainUI
         '
         'SfdTaskName
         '
-        Me.SfdTaskName.Filter = "All Files|*.*"
+        Me.SfdTaskName.Filter = "Transport Stream|*.ts|All Files|*.*"
         '
         'BgwCoreWorker
         '
